@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
 
 class CustomLinearRegression:
@@ -33,16 +35,25 @@ class CustomLinearRegression:
 
 
 def main():
-    capacity = [0.9, 0.5, 1.75, 2.0, 1.4, 1.5, 3.0, 1.1, 2.6, 1.9]
-    age = [11, 11, 9, 8, 7, 7, 6, 5, 5, 4]
-    cost_per_ton = [21.95, 27.18, 16.9, 15.37, 16.03, 18.15, 14.22, 18.72, 15.4, 14.69]
-    X, y = np.array([capacity, age]).T, np.array(cost_per_ton).T
+    f1 = [2.31, 7.07, 7.07, 2.18, 2.18, 2.18, 7.87, 7.87, 7.87, 7.87]
+    f2 = [65.2, 78.9, 61.1, 45.8, 54.2, 58.7, 96.1, 100.0, 85.9, 94.3]
+    f3 = [15.3, 17.8, 17.8, 18.7, 18.7, 18.7, 15.2, 15.2, 15.2, 15.2]
+    y = [24.0, 21.6, 34.7, 33.4, 36.2, 28.7, 27.1, 16.5, 18.9, 15.0]
+    X, y = np.array([f1, f2, f3]).T, np.array(y).T
 
     model = CustomLinearRegression(fit_intercept=True)
     model.fit(X, y)
     yhat = model.predict(X)
-    print({'Intercept': model.intercept, 'Coefficient': model.coefficient,
-           'R2': model.r2_score(y, yhat), 'RMSE': model.rmse(y, yhat)})
+    custom_dict = {'Intercept': model.intercept, 'Coefficient': model.coefficient,
+                   'R2': model.r2_score(y, yhat), 'RMSE': model.rmse(y, yhat)}
+
+    model_skl = LinearRegression(fit_intercept=True)
+    model_skl.fit(X, y)
+    yhat_skl = model_skl.predict(X)
+    skl_dict = {'Intercept': float(model_skl.intercept_), 'Coefficient': model_skl.coef_,
+                'R2': r2_score(y, yhat_skl), 'RMSE': float(np.sqrt(mean_squared_error(y, yhat_skl)))}
+
+    print({x[0][0]: x[1][1] - x[0][1] for x in zip(custom_dict.items(), skl_dict.items())})
 
 
 if __name__ == '__main__':
